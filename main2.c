@@ -71,13 +71,13 @@ void criaHash (char **clientes, int* size, HashClientes hasht){
 
 void readFile(char** array, char* nomeF, int* lidos, int* maior){
   int size;
-  if (strcmp(nomeF,"/.txt/Vendas_1M"))
+  if (strcmp(nomeF,"/txt/Vendas_1M"))
     size = FILE_SIZE;
   else
     size = VENDAS_SIZE;
 
   char buffer[20]; //ficheiro para abrir, necessário mudar quando for em pastas diferentes
-  sprintf(buffer, "/.txt/%s.txt", nomeF);
+  sprintf(buffer, "/txt/%s.txt", nomeF);
 
   FILE *fp;
   char s[size];
