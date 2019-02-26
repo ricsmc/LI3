@@ -20,6 +20,7 @@ typedef struct clientes{
 
 typedef Clientes HashClientes[HSIZE];
 
+HashClientes hasht;
 
 // 0 - 25 == A-Z mais facil na hash, nao e preciso guardar key
 int upperCaseToInt (char c) {
@@ -30,43 +31,38 @@ char intToUpperCase(int x) {
   return (x+'0'+17);
 }
 
-// lligada add
-void addToHash(Clientes *pt, char *string) {;
-  //struct clientes *pt = client;
+void addToHash(Clientes *pt, char *string) {
   if ((*pt)->info == USADO) {
     while(*pt) {
       pt = &((*pt)->next);
     }
     *pt = malloc(sizeof(struct clientes));
   }
-
-  //pt = malloc(sizeof(struct clientes));
-  (*pt)->str = strdup(string);
+  (*pt)->str = strdup(string); 
   (*pt)->info = USADO;
   (*pt)->next = NULL;
 }
 
 void printHashIndex(Clientes *cliente) {
+  int quantos = 0;
   while((*cliente) && (*cliente)->info == USADO) {
-    printf("%s", (*cliente)->str);
+    printf("%s\n", (*cliente)->str);
+    quantos++;
     cliente = &((*cliente)->next);
   }
+  printf("Foram lidos %d válidos\n", quantos);
 }
 
+int isValidClient (char *s) {
+    int result = atoi(s+1);
+    int x = upperCaseToInt(s[0]);
+    return (x>=0 && x<=25 && result>=1000 && result <=5000);
+}
 // transforma clientes em hash de A--Ẑ
-void criaHash (char **clientes, int* size, HashClientes hasht){
+void criaHash (char *clientes, HashClientes hasht){
   char primeiro;
-  int hashIndex;
-    for (int i = 0; i<*size;i++) {
-      primeiro = clientes[i][0];
-      //printf("%c\n", primeiro); certo
-      hashIndex=upperCaseToInt(primeiro);
-      //printf("%s\n", clientes[i]); certo
-      addToHash(&hasht[primeiro % 'A'],clientes[i]);
-
-    }
-    printHashIndex(&hasht[3]); // 0--25 == A--Z
-    //printf("%s\n", hasht[0]->next->str);
+  primeiro = clientes[0];
+  if (isValidClient(clientes)) addToHash(&hasht[primeiro % 'A'],clientes);
 }
 
 void readFile(char** array, char* nomeF, int* lidos, int* maior){
@@ -81,45 +77,33 @@ void readFile(char** array, char* nomeF, int* lidos, int* maior){
 
   FILE *fp;
   char s[size];
+  char *x;
   int i = 0;
 
   fp = fopen(buffer,"r");
+  if (!fp) exit(1);
   while (fgets(s,size,fp)){
-    array[i++] = strdup (s);
-    *maior = strlen(s) > (*maior) ? strlen(s) : (*maior); // Problema: Lê '\n'
-  }
+    x = strdup (strtok(s,"\n\r"));
+    criaHash(x,hasht);
+    *maior = strlen(s) > (*maior) ? strlen(s) : (*maior); // Problema: Lê '\n' not anymore
+  }  
   fclose(fp);
   *lidos = i;
+
 }
 
 int main () {
-  /*int x = 25;
-  printf("%c\n",intToUpperCase(x) );
-  char c = 'Z';
-  printf("%d\n", upperCaseToInt(c));
-  char *str = strdup("OLA");
-  char *str2 =strdup(str + 1);
-  printf("%s\n", str2);
-  */
+  
   char str[15] = "Clientes";
   char** array = malloc(sizeof(char)*CLIEN*FILE_SIZE);
   int lidos = 0, maior = 0;
-  readFile (array,str,&lidos,&maior);
-  HashClientes hasht;
   for (int i =0; i<HSIZE;i++) {
     hasht[i] = malloc(sizeof(struct clientes));
     hasht[i]->info = N_USADO;
-   // hasht[i]->str = strdup("NULL");
     hasht[i]->next = NULL;
   }
-  //hasht[25]->str = strdup("A8442");
-  //hasht[25]->next = malloc(sizeof(struct clientes));
-  //hasht[25]->next->str = strdup("H8441");
-  //hasht[25]->next->next = NULL;
-
-  criaHash(array,&lidos,hasht);
-  //printf("%s\n",hasht[25]->str);
-  //printHashIndex(hasht[0]);
+  readFile (array,str,&lidos,&maior);  
+  printHashIndex(&hasht[3]); // 0--25 A--Z
   free(array);
   for (int i = 0; i<HSIZE; i++) {
     free(hasht[i]);
