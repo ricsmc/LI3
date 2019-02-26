@@ -62,7 +62,7 @@ void criaHash (char **clientes, int* size, HashClientes hasht){
       //printf("%c\n", primeiro); certo
       hashIndex=upperCaseToInt(primeiro);
       //printf("%s\n", clientes[i]); certo
-      addToHash(&hasht[hashIndex],clientes[i]);
+      addToHash(&hasht[primeiro % 'A'],clientes[i]);
 
     }
     printHashIndex(&hasht[3]); // 0--25 == A--Z
